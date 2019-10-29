@@ -36,12 +36,27 @@ def index():
 def register():
     form = UserForm()
     message = None
+    if form.validate_on_submit():
+        uname, pword, twofa = get_data(request)
+        if uname in users.keys():
+            message = 'Registration failure! Username taken!'
+        else:
+            users[uname] = User(uname, pword, twofa)
+            message = 'Registration success! Login to continue'
+    elif request.method == 'POST':
+        message = 'Registration failure!'
     return render_template('register.html', form=form, message=message)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = UserForm()
     message = None
+    if form.validate_on_submit():
+        uname, pword, twofa = get_data(request)
+        if uname not in users.keys():
+            message = "Incorrect username/password"
+        else:
+            message = users[uname].authenticate(uname, pword, twofa)
     return render_template('login.html', form=form, message=message)
 
 @app.route('/spell_check', methods=['GET', 'POST'])
@@ -51,6 +66,4 @@ def spell_check():
 
 if __name__=='__main__':
     app.run()
-
-
 
