@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if textout %}
+<div id="textout">
+    <font style="color: green">
+        {{ textout }}
+    </font>
+</div>
+{% endif %}
+
+{% if misspelled %}
+<div id="textout">
+    <font style="color: red">
+        {{ textout }}
+    </font>
+</div>
+{% endif %}
+
+<form method="POST" action="/spell_check">
+
+    {{ form.csrf_token }}
+    {% include "partials/spell_form.html" %}
+
+</form>
+
+{% endblock %}
+
