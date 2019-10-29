@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Spell Checker</title>
+</head>
+
+<body>
+    <div style="width: 50%; margin: 0 auto;">
+
+        <div>
+            <h1>Spell Checker</h1>
+        </div>
+
+        <div class=navigation>
+
+            {% if current_user.is_authenticated %}
+
+                <div>
+                    <a href="/spell_check" style="padding-right: 20px">
+                        Spell Check!
+                    </a>
+                </div>
+
+            {% else %}
+ 
+                <div>
+
+                    <div style="display:inline-block">
+                        <a href="/register" style="padding-right: 20px">
+                            Register
+                        </a> 
+                    </div>
+
+                    <div style="display:inline-block">
+                        <a href="/login" style="padding-right: 20px">
+                            Login
+                        </a> 
+                    </div>
+
+                </div>
+               
+            {% endif %}
+
+        </div>
+
+        <div>
+            {% block content %}
+            {% endblock %}
+        </div>
+
+    </div>
+</body>
+
+</html>
+

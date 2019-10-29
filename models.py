@@ -5,7 +5,7 @@ class User:
         self.uname = uname
         self.pword = check_password_hash(pword)
         self.twofa = generate_password_hash(twofa)
-        self.authenticated = True
+        self.authenticated = False
 
     def is_active(self):
         return True

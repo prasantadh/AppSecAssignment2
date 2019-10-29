@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if message %}
+
+    <div id="success">
+        <font style="color: blue">
+            {{ message }}
+        </font>
+    </div>
+
+{% endif %}
+
+{% if not (message and 'success' in message) %}
+
+<form method="POST" action="/register">
+
+    {{ form.csrf_token }}
+    {% include "partials/user_form.html" %}
+
+</form>
+
+{% endif %}
+
+{% endblock %}

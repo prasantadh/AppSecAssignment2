@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if message %}
+<div id="result">
+    <font style="color: blue">
+        {{ message }}
+    </font>
+</div>
+{% endif %}
+
+{% if not current_user.is_authenticated %}
+<form method="POST" action="/login">
+    {{ form.csrf_token }}
+    {% include "partials/user_form.html" %}
+
+</form>
+{% else %}
+<p> You can now proceed to spell check page to use our services </p>
+{% endif %}
+
+{% endblock %}
+
