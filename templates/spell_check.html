@@ -4,15 +4,15 @@
 {% if textout %}
 <div id="textout">
     <font style="color: green">
-        {{ textout }}
+        <div> <strong> Given: </strong> </div> 
+        <div> {{ textout }} </div>
     </font>
 </div>
-{% endif %}
 
-{% if misspelled %}
 <div id="textout">
     <font style="color: red">
-        {{ textout }}
+        <div> <strong> Misspelled: </strong> </div>
+        <div> {{ misspelled }} </div>
     </font>
 </div>
 {% endif %}

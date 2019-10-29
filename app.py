@@ -2,6 +2,7 @@
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_required, current_user
 from os import urandom
+from subprocess import Popen, PIPE, STDOUT
 
 # imports from local files
 from models import User
@@ -68,6 +69,17 @@ def spell_check():
     textout = None
     misspelled = None
     form = SpellForm()
+    if form.validate_on_submit():
+        textout = request.form['inputtext']
+        filename = urandom(32).hex()
+        f = open(filename, 'w')
+        f.write(textout)
+        f.close()
+        stdout, stderr = Popen(['./a.out', filename, 'wordlist.txt'],
+            stdout=PIPE, stderr=STDOUT).communicate()
+        misspelled = stdout.decode().replace('\n',',')
+        p = Popen(['rm', filename], stdout=PIPE, stderr=STDOUT)
+
     return render_template('spell_check.html', \
             form=form, textout=textout,misspelled=misspelled)
 

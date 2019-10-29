@@ -13,6 +13,6 @@ class UserForm(FlaskForm):
             validators=[length(min=9)])
 
 class SpellForm(FlaskForm):
-    to_check = TextAreaField('Text to check', id='inputtext', \
+    inputtext = TextAreaField('Text to check', \
             validators=[DataRequired()])
 
