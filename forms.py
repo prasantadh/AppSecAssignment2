@@ -8,4 +8,4 @@ class UserForm(FlaskForm):
     pword = PasswordField('Password', \
             validators=[DataRequired(), length(min=8)])
     twofa = StringField('Phone number', id='2fa', \
-            validators=[length(max=9, min=9)])
+            validators=[length(min=9)])
