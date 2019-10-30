@@ -11,14 +11,23 @@ from forms import UserForm, SpellForm
 # global settings
 app = Flask(__name__)
 ## app.config.from_object('config')
-app.config['SECRET_KEY'] = urandom(24)
+app.config['SECRET_KEY'] = urandom(32)
 login = LoginManager(app)
 login.login_view = 'login'
+login.session_protection = "strong"
 users = {} #our make-do database for users
 
 @login.user_loader
 def load_user(uname):
     return users.get(uname)
+
+@app.after_request
+def apply_caching(response):
+    response.headers['Content-Security-Policy'] = "default-src 'self'"
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
 
 # parse data from the incoming requests
 def get_data(request):
@@ -31,8 +40,6 @@ def get_data(request):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if current_user.is_authenticated:
-        return redirect(url_for('spell_check'))
     return render_template('home.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -56,7 +63,6 @@ def login():
     message = None
     if form.validate_on_submit():
         uname, pword, twofa = get_data(request)
-        print(uname, pword, twofa)
         if uname not in users.keys():
             message = "Incorrect username/password"
         else:
