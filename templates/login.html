@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% if message %}
 <div id="result">
     <font style="color: blue">
         {{ message }}
     </font>
 </div>
+{% endif %}
 
 {% if not current_user.is_authenticated %}
 <form method="POST" action="/login">
