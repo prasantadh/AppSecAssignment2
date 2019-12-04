@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if spell %}
+    {% with spell=spell%}
+        {% include 'partials/spell_result.html' %}
+    {% endwith %}
+
+{% endif %}
+
+{% endblock %}

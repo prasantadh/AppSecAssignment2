@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, length
 
 class UserForm(FlaskForm):
     uname = StringField('Username', \
-            validators=[DataRequired()])
+            validators=[DataRequired(), length(max=120)])
     pword = PasswordField('Password', \
             validators=[DataRequired(), length(min=8)])
     twofa = StringField('Phone number', id='2fa', \
@@ -12,5 +12,5 @@ class UserForm(FlaskForm):
 
 class SpellForm(FlaskForm):
     inputtext = TextAreaField('Text to check', \
-            validators=[DataRequired()])
+            validators=[DataRequired(), length(min=1, max=120)])
 

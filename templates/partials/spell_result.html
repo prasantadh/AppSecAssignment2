@@ -1,0 +1,32 @@
+{% if spell %}
+    <div id="query{{spell.id}}">
+        <a href="/history/query{{spell.id}}">
+        <div id="queryid">
+            <font style="color: blue">
+                <div> Query ID: {{ spell.id }} </div>
+            </font>
+        </div>
+
+        <div id="username">
+            <font style="color: blue">
+                <div> Username: {{ spell.user.uname }} </div>
+            </font>
+        </div>
+
+        <div id="querytext">
+            <font style="color: green">
+                <div> <strong> Given: </strong> </div> 
+                <div> {{ spell.textout }} </div>
+            </font>
+        </div>
+        
+        <div id="queryresults">
+            <font style="color: red">
+                <div> <strong> Misspelled: </strong> </div>
+                <div> {{ spell.misspelled }} </div>
+            </font>
+        </div>
+        </a>
+    </div>
+    <br/><br/>
+{% endif %}

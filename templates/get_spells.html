@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div id="numqueries">
+        {{ numqueries  }}
+</div>
+
+{% if spells %}
+    {% for spell in spells %}
+        {% with spell=spell %}
+            {% include 'partials/spell_result.html' %}
+        {% endwith%}
+    {% endfor%}
+{% endif %}
+
+{% endblock %}

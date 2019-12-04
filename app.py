@@ -6,7 +6,7 @@ from subprocess import Popen, PIPE, STDOUT
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # imports from local files
-from models import User
+from models import User, Spell
 from forms import UserForm, SpellForm
 
 # global settings
@@ -18,10 +18,11 @@ login.login_view = 'login'
 login.session_protection = "strong"
 
 # setup sqlite database for users
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/production.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 from models import db
 db.init_app(app)
+
 
 @login.user_loader
 def load_user(user_id):
@@ -101,10 +102,30 @@ def spell_check():
             stdout=PIPE, stderr=STDOUT).communicate()
         misspelled = stdout.decode().replace('\n',',')
         p = Popen(['rm', filename], stdout=PIPE, stderr=STDOUT)
-
+        with app.app_context():
+            query = Spell(textout=textout, misspelled=misspelled, user_id=current_user.id) 
+            db.session.add(query)
+            db.session.commit()
     return render_template('spell_check.html', \
             form=form, textout=textout,misspelled=misspelled)
 
+@app.route('/history', methods=['GET'])
+@login_required
+def get_spells():
+    with app.app_context():
+        spells = Spell.query.filter_by(user_id=current_user.id)
+        numqueries = 0 if spells == None else spells.count()
+    return render_template('get_spells.html', numqueries=numqueries, spells=spells)
+
+@app.route('/history/query<int:id>', methods=['GET'])
+@login_required
+def get_spell(id):
+    with app.app_context():
+        spell = Spell.query.get(id)
+        if spell is not None:
+            if not(spell.user.id == current_user.id or current_user.is_admin()):
+                spell = None
+    return render_template('get_spell.html', spell=spell)
 
 if __name__=='__main__':
     app.run()
