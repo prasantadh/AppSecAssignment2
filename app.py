@@ -1,5 +1,5 @@
 # library imports
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, url_for
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 from os import urandom
 from subprocess import Popen, PIPE, STDOUT
@@ -143,15 +143,15 @@ def get_spell(id):
                 spell = None
     return render_template('get_spell.html', spell=spell)
 
-@login_required
 @app.route('/logout', methods=['GET'])
+@login_required
 def logout():
-    logout_user()
     with app.app_context():
         current_sess = UserSession(inAt=None, user_id=current_user.id)
         db.session.add(current_sess)
         db.session.commit()
-    return render_template('/')
+        logout_user()
+    return redirect(url_for('index'))
 
 if __name__=='__main__':
     app.run()

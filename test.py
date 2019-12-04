@@ -9,7 +9,8 @@ def failed(): print("Failed!")
 
 ## test a workflow
 
-for page in ['/', '/login', '/register', '/spell_check']:
+for page in ['/', '/login', '/register', '/spell_check', \
+    '/history', '/history/query1', '/logout']:
     try:
         test('Test: `' + page + '` is live!')
         resp = requests.get(baseurl + page)
@@ -28,7 +29,7 @@ except:
     failed()
 
 try:
-    test('CSRF-less submission fails')
+    test('Test: CSRF-less submission fails')
     data = {'uname': '123456789', 'pword': '123456789',\
             'twofa': '123456789'}
     resp = requests.post(baseurl + '/register', data=data)
@@ -78,3 +79,75 @@ try:
 except Exception as e:
     failed()
 
+try:
+    test('Test: user can review a query')
+    resp = sess.get(baseurl + '/history/query1')
+    assert('queryid' in resp.text)
+    assert('username' in resp.text)
+    assert('querytext' in resp.text)   
+    assert('queryresults' in resp.text)
+    passed()
+except:
+    failed()
+
+try:
+    test('Test: user can view their history')
+    resp = sess.get(baseurl + '/history')
+    assert('id="query1"' in resp.text)
+    assert('id="numqueries' in resp.text)
+    assert('queryid' in resp.text)
+    assert('username' in resp.text)
+    assert('querytext' in resp.text)   
+    assert('queryresults' in resp.text) 
+    assert(inputtext in resp.text)   
+    passed()
+except:
+    failed()
+
+try:
+    test('Test: user can review a specific history')
+    resp = sess.get(baseurl + '/history/query1')
+    assert('id="query1"' in resp.text)
+    assert('queryid' in resp.text)
+    assert('username' in resp.text)
+    assert('querytext' in resp.text)   
+    assert('queryresults' in resp.text) 
+    assert('correct' in resp.text)
+    assert('incorrect' in resp.text)   
+    passed()
+except:
+    failed()
+
+try:
+    test('Test: user can logout')
+    resp = sess.get(baseurl + '/logout')
+    assert('Login' in resp.text)   
+    passed()
+except:
+    failed()
+
+try:
+    test('Test: can register a second valid user')
+    data = {'uname': '0123456789', 'pword': '0123456789',\
+            'twofa': '0123456789'}
+    # sess = requests.session()
+    resp = sess.get(baseurl + '/register')
+    csrf_token = get_csrf_token(resp)
+    data['csrf_token'] = csrf_token
+    resp = sess.post(baseurl + '/register', data=data)
+    assert('Registration success' in resp.text)
+    passed()
+except Exception as e:
+    failed()
+
+try:
+    test('Test: second user can not see first user query')
+    resp = sess.get(baseurl + '/register')
+    csrf_token = get_csrf_token(resp)
+    data['csrf_token'] = csrf_token
+    resp = sess.get(baseurl + '/history/query1')
+    assert('correct' not in resp.text)
+    assert('incorrect' not in resp.text)  
+    passed()
+except Exception as e:
+    failed()
