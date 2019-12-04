@@ -1,13 +1,13 @@
 # library imports
 from flask import Flask, render_template, redirect, request
-from flask_login import LoginManager, login_required, current_user, login_user
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 from os import urandom
 from subprocess import Popen, PIPE, STDOUT
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # imports from local files
-from models import User, Spell
-from forms import UserForm, SpellForm
+from models import User, Spell, UserSession
+from forms import UserForm, SpellForm, UnameForm
 
 # global settings
 app = Flask(__name__)
@@ -87,9 +87,10 @@ def login():
             user = User.query.filter(User.uname == uname).first()
             if user is not None:
                 if check_password_hash(user.pword, pword) and user.twofa == twofa:
-                    user.is_authenticated = True
-                    db.session.commit()
                     login_user(user)
+                    current_sess = UserSession(outAt=None, user_id=current_user.id)
+                    db.session.add(current_sess)
+                    db.session.commit()
                     message = 'Login success'
                 elif user.twofa != twofa:
                     message = 'Two-factor failure!'
@@ -118,13 +119,19 @@ def spell_check():
     return render_template('spell_check.html', \
             form=form, textout=textout,misspelled=misspelled)
 
-@app.route('/history', methods=['GET'])
+@app.route('/history', methods=['GET', 'POST'])
 @login_required
 def get_spells():
+    form = UnameForm()
+    uname = current_user.uname
+    if form.validate_on_submit():
+        if current_user.is_admin():
+            uname = request.form['uname']
     with app.app_context():
-        spells = Spell.query.filter_by(user_id=current_user.id)
+        user = User.query.filter_by(uname=uname).first()
+        spells = Spell.query.filter_by(user_id=user.id)
         numqueries = 0 if spells == None else spells.count()
-    return render_template('get_spells.html', numqueries=numqueries, spells=spells)
+    return render_template('get_spells.html', form=form, numqueries=numqueries, spells=spells)
 
 @app.route('/history/query<int:id>', methods=['GET'])
 @login_required
@@ -135,6 +142,16 @@ def get_spell(id):
             if not(spell.user.id == current_user.id or current_user.is_admin()):
                 spell = None
     return render_template('get_spell.html', spell=spell)
+
+@login_required
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    with app.app_context():
+        current_sess = UserSession(inAt=None, user_id=current_user.id)
+        db.session.add(current_sess)
+        db.session.commit()
+    return render_template('/')
 
 if __name__=='__main__':
     app.run()

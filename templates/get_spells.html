@@ -13,4 +13,12 @@
     {% endfor%}
 {% endif %}
 
+{% if current_user.is_admin() %}
+    <form method="POST" action="/history">
+        {{ form.csrf_token }}
+        {% include "partials/uname_form.html" %}
+
+    </form>
+{% endif %}
+
 {% endblock %}

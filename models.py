@@ -40,3 +40,12 @@ class User(db.Model):
     def __str__(self):
         return "uname : {}\n pword: {}\n  2fa: {}\n"\
                 .format(self.uname, self.pword, self.twofa)
+
+from datetime import datetime
+class UserSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    inAt  = db.Column(db.DateTime, nullable=True,default=datetime.utcnow)
+    outAt = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+    
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user =  db.relationship('User', backref=db.backref('sessions', lazy=True))
