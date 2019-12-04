@@ -14,3 +14,6 @@ class SpellForm(FlaskForm):
     inputtext = TextAreaField('Text to check', \
             validators=[DataRequired(), length(min=1, max=120)])
 
+class UnameForm(FlaskForm):
+    uname = StringField('Username', \
+            validators=[DataRequired(), length(max=120)])
