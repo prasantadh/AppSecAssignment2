@@ -11,8 +11,7 @@ from forms import UserForm, SpellForm, UnameForm
 
 # global settings
 app = Flask(__name__)
-## app.config.from_object('config')
-app.config['SECRET_KEY'] = urandom(32)
+app.config['SECRET_KEY'] = open("/run/secrets/secret_key", "rb").read().strip()
 login = LoginManager(app)
 login.login_view = 'login'
 login.session_protection = "strong"
@@ -24,9 +23,10 @@ from models import db
 db.init_app(app)
 
 # set up an admin
-## very problematic piece of code. Only here to comply with
-## gradescope tests
-admin = User('admin', 'Administrator@1', '12345678901')
+admin_uname = open("/run/secrets/admin_uname", "r").read().strip()
+admin_pword = open("/run/secrets/admin_pword", "r").read().strip()
+admin_2fa   = open("/run/secrets/admin_2fa", "r").read().strip()
+admin = User(admin_uname, admin_pword, admin_2fa)
 with app.app_context():
     db.drop_all()
     db.create_all()
@@ -113,7 +113,7 @@ def spell_check():
         misspelled = stdout.decode().replace('\n',',')
         p = Popen(['rm', filename], stdout=PIPE, stderr=STDOUT)
         with app.app_context():
-            query = Spell(textout=textout, misspelled=misspelled, user_id=current_user.id) 
+            query = Spell(textout=textout, misspelled=misspelled, user_id=current_user.id)
             db.session.add(query)
             db.session.commit()
     return render_template('spell_check.html', \

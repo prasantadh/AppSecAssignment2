@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+    web:
+        build: .
+        image: appsec_assignment4:1.0.1
+        secrets:
+            - admin_uname
+            - admin_pword
+            - admin_2fa
+            - secret_key
+        deploy:
+            replicas: 4
+        ports:
+            - "8080:8080"
+secrets:
+    admin_uname:
+        file: secrets/admin_uname
+    admin_pword:
+        file: secrets/admin_pword
+    admin_2fa:
+        file: secrets/admin_2fa
+    secret_key:
+        file: secrets/secret_key
